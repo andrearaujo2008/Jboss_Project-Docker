@@ -1,0 +1,26 @@
+version: '3.8'
+
+# 1. Criacao da rede isolada para o laboratorio
+networks:
+  jboss-net: #Criamos uma rede virtual chamando jboss-net
+    driver: bridge #Cominica com outras Vms dentro da Rede no caso Frontend e Jboss do nosso curso
+# 2. Definicao dos nossos servicos
+services:
+
+  # Subindo a nossa "VM" do Banco de Dados
+  db-mysql: # Identificador do servico no arquivo. Funciona como o "nome DNS" dentro da rede Docker
+    image: mysql:8.0 #Imagem que a gente estamos baixando para usar na nossa imagem
+    container_name: lab-mysql #Nome do container que vai aparecer na tela quando a gente digita docker ps
+    restart: always #Ele vai reiniciar sempre se falhar memoria do computador, ele vai terntar subir novamente o banco de dados
+    networks: #Liga esta "VM" a rede privada que criamos no inicio
+    - jboss-net
+    environment: #Aqui e o dados iniciais para que o banco de dados inicia 
+      MYSQL_ROOT_PASSWORD: server #Password do mysql 
+      MYSQL_DATABASE: jboss_db #Username para mysql
+    deploy:
+      resources: #Aqui e o limite que a CPU e memoria pode chegar nesta imagem
+        limits:
+          cpus: 2.0
+          memory: 4G
+    ports: #Aqio a porta que utiliza o Mysql
+      - "3306:3306"
